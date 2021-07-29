@@ -4,7 +4,6 @@ const app = express()
 const { config } = require('./config/index')
 
 // Importing Middlewares
-const morgan = require('morgan')
 const cors = require('cors')
 const { logErrors, wrapErrors, errorHandler } = require('./utils/middlewares/errorHandler')
 
@@ -19,7 +18,7 @@ app.use(express.json())
 
 // Morgan 
 if(config.dev) {
-    app.use(morgan('dev'))
+    app.use(require('morgan')('dev'))
 }
 
 // CORS
