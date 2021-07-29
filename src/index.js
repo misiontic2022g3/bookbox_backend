@@ -18,7 +18,9 @@ const userBooksApi = require('./routes/userBooks.routes')
 app.use(express.json())
 
 // Morgan 
-app.use(morgan('dev'))
+if(config.dev) {
+    app.use(morgan('dev'))
+}
 
 // CORS
 app.use(cors())
