@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "set DEBUG=app:* && nodemon --exec node src/index.js",
-    "start": "set NODE_ENV=production && node src/index.js",
+    "start": "node src/index.js",
     "makeMocks": "node src/utils/scripts/gettingData.js",
     "firstRun": "node firstRun.js"
   },
