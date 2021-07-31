@@ -25,7 +25,7 @@ function userBooksApi(app) {
                 })
                 res.status(200).json({
                     data: userBooks,
-                    message: 'user movies listed',
+                    message: 'user books listed',
                 })
             } catch (error) {
                 next(error)
