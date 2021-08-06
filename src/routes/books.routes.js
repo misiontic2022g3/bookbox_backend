@@ -1,4 +1,5 @@
 const express = require('express')
+const passport = require('passport')
 const BooksService = require('../services/books.service')
 const validationHandler = require('../utils/middlewares/validationHandler')
 
@@ -9,27 +10,34 @@ const {
     updateBookSchema,
 } = require('../utils/schemas/books')
 
+require('../utils/auth/strategies/jwt')
+
 function booksApi(app) {
     const router = express.Router()
     app.use('/api/books', router)
 
     const booksService = new BooksService()
 
-    router.get('/', async function (req, res, next) {
-        const { tags } = req.query
-        try {
-            const books = await booksService.getBooks({ tags })
-            res.status(200).json({
-                data: books,
-                message: 'books listed',
-            })
-        } catch (error) {
-            next(error)
+    router.get(
+        '/',
+        passport.authenticate('jwt', { session: false }),
+        async function (req, res, next) {
+            const { tags } = req.query
+            try {
+                const books = await booksService.getBooks({ tags })
+                res.status(200).json({
+                    data: books,
+                    message: 'books listed',
+                })
+            } catch (error) {
+                next(error)
+            }
         }
-    })
+    )
 
     router.get(
         '/:bookId',
+        passport.authenticate('jwt', { session: false }),
         validationHandler({ bookId: bookIdSchema }),
         async function (req, res, next) {
             const { bookId } = req.params
@@ -47,6 +55,7 @@ function booksApi(app) {
 
     router.post(
         '/',
+        passport.authenticate('jwt', { session: false }),
         validationHandler(createBookSchema),
         async function (req, res, next) {
             const { body: book } = req
@@ -64,6 +73,7 @@ function booksApi(app) {
 
     router.put(
         '/:bookId',
+        passport.authenticate('jwt', { session: false }),
         // validationHandler({ bookId: bookIdSchema }),
         validationHandler(updateBookSchema),
         async function (req, res, next) {

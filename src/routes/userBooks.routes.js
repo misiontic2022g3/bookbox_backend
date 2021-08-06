@@ -1,4 +1,5 @@
 const express = require('express')
+const passport = require('passport')
 
 const UserBooksService = require('../services/userBook.service')
 const validationHandler = require('../utils/middlewares/validationHandler')
@@ -6,6 +7,8 @@ const validationHandler = require('../utils/middlewares/validationHandler')
 const { bookIdSchema } = require('../utils/schemas/books')
 const { userIdSchema } = require('../utils/schemas/users')
 const { createUserBookSchema } = require('../utils/schemas/userBooks')
+
+require('../utils/auth/strategies/jwt')
 
 function userBooksApi(app) {
     const router = express.Router()
@@ -15,6 +18,7 @@ function userBooksApi(app) {
 
     router.get(
         '/',
+        passport.authenticate('jwt', { session: false }),
         validationHandler({ userId: userIdSchema }, 'query'),
         async function (req, res, next) {
             const { userId } = req.query
@@ -35,6 +39,7 @@ function userBooksApi(app) {
 
     router.post(
         '/',
+        passport.authenticate('jwt', { session: false }),
         validationHandler(createUserBookSchema),
         async function (req, res, next) {
             const { body: userBook } = req
@@ -54,6 +59,7 @@ function userBooksApi(app) {
 
     router.delete(
         '/:userBookId',
+        passport.authenticate('jwt', { session: false }),
         validationHandler({ userBookId: bookIdSchema }, 'params'),
         async function (req, res, body) {
             const { userBookId } = req.params

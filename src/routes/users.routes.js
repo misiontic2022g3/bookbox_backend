@@ -1,4 +1,5 @@
 const express = require('express')
+const passport = require('passport')
 
 const UsersService = require('../services/users.service')
 const validationHandler = require('../utils/middlewares/validationHandler')
@@ -8,26 +9,33 @@ const {
     updateUserSchema,
 } = require('../utils/schemas/users')
 
+require('../utils/auth/strategies/jwt')
+
 function usersApi(app) {
     const router = express.Router()
     app.use('/api/users', router)
 
     const usersService = new UsersService()
 
-    router.get('/', async function (req, res, next) {
-        try {
-            const users = await usersService.getUsers()
-            res.status(200).json({
-                data: users,
-                message: 'users listed',
-            })
-        } catch (error) {
-            next(error)
+    router.get(
+        '/',
+        passport.authenticate('jwt', { session: false }),
+        async function (req, res, next) {
+            try {
+                const users = await usersService.getUsers()
+                res.status(200).json({
+                    data: users,
+                    message: 'users listed',
+                })
+            } catch (error) {
+                next(error)
+            }
         }
-    })
+    )
 
     router.get(
         '/:userId',
+        passport.authenticate('jwt', { session: false }),
         validationHandler({ userId: userIdSchema }),
         async function (req, res, next) {
             const { userId } = req.params
@@ -45,15 +53,16 @@ function usersApi(app) {
 
     router.post(
         '/',
+        passport.authenticate('jwt', { session: false }),
         validationHandler(createUserSchema),
         async function (req, res, next) {
             const { body: user } = req
             const { email } = user
             try {
                 const userEmail = await usersService.getUser({ email })
-                if(userEmail) {
+                if (userEmail) {
                     return res.status(205).json({
-                        message: 'email is already exists'
+                        message: 'email is already exists',
                     })
                 }
                 const createdUserId = await usersService.createUser({ user })
@@ -69,6 +78,7 @@ function usersApi(app) {
 
     router.put(
         '/:userId',
+        passport.authenticate('jwt', { session: false }),
         // validationHandler({ userId: userIdSchema }),
         validationHandler(updateUserSchema),
         async function (req, res, next) {
@@ -92,6 +102,7 @@ function usersApi(app) {
 
     router.delete(
         '/:userId',
+        passport.authenticate('jwt', { session: false }),
         validationHandler({ userId: userIdSchema }),
         async function (req, res, next) {
             const { userId } = req.params
