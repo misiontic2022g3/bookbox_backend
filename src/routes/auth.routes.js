@@ -94,7 +94,8 @@ function authApi(app) {
                 const userEmail = await usersService.getUser({ email })
 
                 if (userEmail) {
-                    next(boom.unauthorized('El email ya existe'))
+                    return next(boom.unauthorized('El email ya existe'))
+                    
                 }
 
                 const createdUserId = await usersService.createUser({ user })
@@ -104,7 +105,7 @@ function authApi(app) {
                 })
 
                 if (!apiKey) {
-                    next(boom.unauthorized('Hay problemas con tus permisos'))
+                    return next(boom.unauthorized('Hay problemas con tus permisos'))
                 }
 
                 const payload = {
